@@ -23,46 +23,56 @@ type Data = {
   role: string
 }
 
-export default function page() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
+export default function Invite() {
+  // Use dynamic import for client-side only libraries
+  const [isClientSide, setIsClientSide] = useState(false)
+
+  useEffect(() => {
+    setIsClientSide(true)
+  }, [])
+
+  const searchParams = isClientSide ? useSearchParams() : null
+  const router = isClientSide ? useRouter() : null
+
   const [showAcceptAlert, setShowAcceptAlert] = useState<'pending' | 'yes' | 'no'>('pending')
   const [showCompleteSetup, setShowCompleteSetup] = useState(false)
   const [data, setData] = useState<Data>()
   const [token, setToken] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+
   const { apiRequest: acceptInvite, loading: acceptingInvite } = useApiRequest()
   const { apiRequest: rejectInvite, loading: rejectingInvite } = useApiRequest()
   const { apiRequest: confirmToken } = useApiRequest()
 
   useEffect(() => {
+    if (!isClientSide) return
     ;(async () => {
       try {
-        const token = searchParams.get('token')
-        if (token) {
-          const decoded = (await jwtDecode(token)) as Data
-          setToken(token)
+        const tokenParam = searchParams?.get('token')
+        if (tokenParam) {
+          const decoded = (await jwtDecode(tokenParam)) as Data
+          setToken(tokenParam)
           setData(decoded)
 
           const response = await confirmToken({
             url: `/admin-auth/accept-invite`,
             method: 'POST',
             data: {
-              token,
+              token: tokenParam,
             },
           })
 
           console.log('ss', response)
           if (response.success) setShowAcceptAlert('yes')
-          else router.replace('/auth/admin/invite/error')
+          else router?.replace('/auth/admin/invite/error')
         }
       } catch (e) {
         console.error('Error decoding token:', e)
-        router.replace('/auth/admin/invite/error')
+        router?.replace('/auth/admin/invite/error')
       }
     })()
-  }, [])
+  }, [isClientSide, searchParams, router])
 
   const acceptInviteHandler = async () => {
     const response = await acceptInvite({
@@ -74,7 +84,7 @@ export default function page() {
         password,
       },
     })
-    if (response.success) router.replace('/auth/admin/invite/accepted')
+    if (response.success) router?.replace('/auth/admin/invite/accepted')
   }
 
   const rejectInviteHandler = async () => {
@@ -86,7 +96,12 @@ export default function page() {
         action: 'reject',
       },
     })
-    if (response.success) router.replace('/auth/admin/invite/rejected')
+    if (response.success) router?.replace('/auth/admin/invite/rejected')
+  }
+
+  // Render nothing during server-side rendering
+  if (!isClientSide) {
+    return null
   }
 
   if (showAcceptAlert !== 'yes' && !showCompleteSetup)

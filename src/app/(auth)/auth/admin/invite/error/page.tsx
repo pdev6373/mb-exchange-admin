@@ -7,7 +7,7 @@ export const closeWindow = () => {
   window.close()
 }
 
-export default function page() {
+export default function AdminError() {
   return (
     <div className="flex min-h-screen items-center justify-center px-5">
       <Card className="max-w-[500px]">

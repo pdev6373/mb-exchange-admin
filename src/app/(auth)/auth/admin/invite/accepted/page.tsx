@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useRouter } from 'next/navigation'
 
-export default function page() {
+export default function AdminAccepted() {
   const router = useRouter()
 
   return (

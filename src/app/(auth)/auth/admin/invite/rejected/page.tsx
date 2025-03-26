@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { closeWindow } from '../error/page'
 
-export default function page() {
+export default function AdminRejected() {
   return (
     <div className="flex min-h-screen items-center justify-center px-5">
       <Card className="max-w-[500px]">
