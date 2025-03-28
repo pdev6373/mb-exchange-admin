@@ -337,7 +337,7 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
               </div>
 
               <div className="mt-4 space-y-1.5">
-                <h3 className="text-sm font-medium">Add Rate (In Dollats):</h3>
+                <h3 className="text-sm font-medium">Add Rate (In Dollars):</h3>
                 <Input
                   placeholder="Enter dollar rate"
                   value={rate}
