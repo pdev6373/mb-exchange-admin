@@ -53,7 +53,8 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
   const [platformAddresses, setPlatformAddresses] = useState<PlatformAddress[]>([])
   const [nativeAddress, setNativeAddress] = useState<string>('')
   const [rate, setRate] = useState('')
-  const [vipRate, setVipRate] = useState('')
+  const [ngnRate, setNgnRate] = useState('')
+  const [ghcRate, setGhcRate] = useState('')
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false)
   const [open, setOpen] = useState(false)
   const [page, setPage] = useState<number>(1)
@@ -72,8 +73,8 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
       const allPlatformsHaveAddresses = selectedPlatforms.every((platform) =>
         platformAddresses.some((pl) => pl.platform === platform && pl.address.trim() !== '')
       )
-      return allPlatformsHaveAddresses && rate !== ''
-    } else return nativeAddress.trim() !== '' && rate !== ''
+      return allPlatformsHaveAddresses && rate !== '' && ghcRate !== '' && ngnRate !== ''
+    } else return nativeAddress.trim() !== '' && rate !== '' && ghcRate !== '' && ngnRate !== ''
   }
 
   useEffect(() => {
@@ -148,7 +149,8 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
         symbol: selectedCrypto?.symbol,
         image: selectedCrypto?.image,
         rate: Number(rate) || undefined,
-        vipRate: Number(vipRate) || undefined,
+        ngnRate: Number(ngnRate) || undefined,
+        ghcRate: Number(ghcRate) || undefined,
         description: cryptoData?.description?.en,
         hasPlatforms,
         isActive: true,
@@ -168,7 +170,8 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
       setPlatformAddresses([])
       setNativeAddress('')
       setRate('')
-      setVipRate('')
+      setNgnRate('')
+      setGhcRate('')
     }
   }
 
@@ -316,19 +319,29 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
               <div className="mt-4 space-y-1.5">
                 <h3 className="text-sm font-medium">Add Rate (In Naira):</h3>
                 <Input
-                  placeholder="Enter rate"
-                  value={rate}
-                  onChange={(e) => setRate(e.target.value)}
+                  placeholder="Enter naira rate"
+                  value={ngnRate}
+                  onChange={(e) => setNgnRate(e.target.value)}
                   className="w-full"
                 />
               </div>
 
               <div className="mt-4 space-y-1.5">
-                <h3 className="text-sm font-medium">Add Vip Rate (In Naira) (Optional):</h3>
+                <h3 className="text-sm font-medium">Add Rate (In Cedis):</h3>
                 <Input
-                  placeholder="Enter vip rate"
-                  value={vipRate}
-                  onChange={(e) => setVipRate(e.target.value)}
+                  placeholder="Enter cedis rate"
+                  value={ghcRate}
+                  onChange={(e) => setGhcRate(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="mt-4 space-y-1.5">
+                <h3 className="text-sm font-medium">Add Rate (In Dollats):</h3>
+                <Input
+                  placeholder="Enter dollar rate"
+                  value={rate}
+                  onChange={(e) => setRate(e.target.value)}
                   className="w-full"
                 />
               </div>
