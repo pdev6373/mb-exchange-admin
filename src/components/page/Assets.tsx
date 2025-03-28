@@ -21,6 +21,16 @@ import LoadingTable from '../loader/table'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../table'
 import { Input } from '../ui/input'
 
+export const formatNumber = (number: number) => {
+  const roundedNumber = Math.abs(Math.floor(number * 100) / 100)
+  if (roundedNumber >= 1000)
+    return `${roundedNumber.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`
+  return `${roundedNumber.toFixed(2)}`
+}
+
 export default function Assets() {
   const [assets, setAssets] = useState<IAsset[]>()
   const [toUpdate, setToUpdate] = useState<IAsset>()
@@ -110,8 +120,9 @@ export default function Assets() {
               <TableHeader>Name</TableHeader>
               <TableHeader>Symbol</TableHeader>
               <TableHeader>Icon</TableHeader>
-              <TableHeader>Rate</TableHeader>
-              <TableHeader>VIP Rate</TableHeader>
+              <TableHeader>Dollar Rate</TableHeader>
+              <TableHeader>Naira Rate</TableHeader>
+              <TableHeader>Cedis Rate</TableHeader>
               <TableHeader>Total Platforms</TableHeader>
               <TableHeader>Status</TableHeader>
               <TableHeader>Actions</TableHeader>
@@ -127,7 +138,8 @@ export default function Assets() {
                       asset?.name?.toLowerCase().trim().includes(search?.toLowerCase().trim()) ||
                       asset?.symbol?.toLowerCase().trim().includes(search?.toLowerCase().trim()) ||
                       asset?.rate?.toString()?.toLowerCase().trim().includes(search?.toLowerCase().trim()) ||
-                      asset?.vipRate?.toString()?.toLowerCase().trim().includes(search?.toLowerCase().trim())
+                      asset?.ngnRate?.toString()?.toLowerCase().trim().includes(search?.toLowerCase().trim()) ||
+                      asset?.ghcRate?.toString()?.toLowerCase().trim().includes(search?.toLowerCase().trim())
                   )
                   ?.map((asset) => (
                     <TableRow key={asset._id} href={undefined}>
@@ -136,8 +148,9 @@ export default function Assets() {
                       <TableCell>
                         {asset?.image ? <Image src={asset.image} alt="asset icon" width={24} height={24} /> : '-'}
                       </TableCell>
-                      <TableCell>{asset.rate}</TableCell>
-                      <TableCell>{asset.vipRate}</TableCell>
+                      <TableCell>{`$${formatNumber(asset.rate)}`}</TableCell>
+                      <TableCell>{`₦${formatNumber(asset.ngnRate)}`}</TableCell>
+                      <TableCell>{`GH₵${formatNumber(asset.ghcRate)}`}</TableCell>
                       <TableCell>{asset.platformAddresses?.length}</TableCell>
                       <TableCell>
                         {

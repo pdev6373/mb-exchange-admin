@@ -5,7 +5,8 @@ export interface IAsset {
   symbol: string
   image?: string
   rate: number
-  vipRate?: number
+  ngnRate: number
+  ghcRate: number
   description?: string
   hasPlatforms?: boolean
   isActive?: boolean
