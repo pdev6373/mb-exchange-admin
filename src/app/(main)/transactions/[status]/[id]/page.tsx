@@ -78,6 +78,8 @@ export default function Transaction({ params }: Transaction) {
             <AlertDialogDescription>
               {`This action will mark this transaction as ${status}, are you sure you want to continue?`}
             </AlertDialogDescription>
+          </AlertDialogHeader>
+          {status == 'successful' ? (
             <AlertDialogContent>
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                 {`Amount Transferred (${transaction?.rate?.startsWith('₦') ? 'In Naira' : transaction?.rate?.startsWith('₵') ? 'In Cedis' : 'In Dollars'})`}
@@ -90,7 +92,9 @@ export default function Transaction({ params }: Transaction) {
                 />
               </div>
             </AlertDialogContent>
-          </AlertDialogHeader>
+          ) : (
+            <></>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={() => {
