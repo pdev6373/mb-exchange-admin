@@ -22,7 +22,7 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState<INotification[]>([])
   const [pagination, setPagination] = useState<PaginationType>()
   const [title, setTitle] = useState('')
-  const [message, setMessage] = useState('')
+  const [content, setContent] = useState('')
   const searchParams = useSearchParams()
   const [rowsPerPage, setRowsPerPage] = useState<number>(parseInt(searchParams.get('rowsPerPage') || '10', 10))
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10))
@@ -56,7 +56,7 @@ export default function Notifications() {
       method: 'POST',
       data: {
         title,
-        message,
+        content,
       },
       showToast: true,
     })
@@ -170,7 +170,7 @@ export default function Notifications() {
                 <div className="flex flex-col gap-3.5">
                   <div className="flex flex-col gap-1.5">
                     <p className="text-lg font-semibold text-black first-letter:uppercase">{notification.title}</p>
-                    <p className="text-sm text-[#535353]">{notification.message}</p>
+                    <p className="text-sm text-[#535353]">{notification.content}</p>
                   </div>
                 </div>
 
