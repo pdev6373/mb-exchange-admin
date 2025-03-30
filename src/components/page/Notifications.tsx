@@ -100,15 +100,15 @@ export default function Notifications() {
                   <Textarea
                     placeholder="Write here"
                     className="min-h-[150px] border-[#D6D9DB] bg-white p-3 text-sm text-[#18181B]"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
                   />
                 </div>
               </div>
             </div>
 
             <div className="mt-8 flex flex-col gap-2">
-              <Button disabled={!title.trim() || !message.trim()} onClick={postNotifications}>
+              <Button disabled={!title.trim() || !content.trim()} onClick={postNotifications}>
                 {addingNotification ? (
                   <div className="py-1">
                     <LoaderIcon className="h-4 w-4 animate-spin" />
@@ -121,7 +121,7 @@ export default function Notifications() {
                 onClick={() => {
                   setShowDialog(false)
                   setTitle('')
-                  setMessage('')
+                  setContent('')
                 }}
                 variant={'ghost'}
               >
