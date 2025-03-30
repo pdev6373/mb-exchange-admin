@@ -131,7 +131,7 @@ export default function Assets() {
 
           <TableBody>
             {gettingAssets
-              ? Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={8} />)
+              ? Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={9} />)
               : assets
                   ?.filter(
                     (asset) =>

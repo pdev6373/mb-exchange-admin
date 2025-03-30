@@ -11,6 +11,7 @@ export type IUser = {
 export type IAsset = {
   id: string
   name: string
+  symbol: string
 }
 
 export type IPlatform = {
@@ -27,8 +28,7 @@ export interface ITransaction {
   platform: IPlatform
   address: string
   quantity: number
-  rate: number
-  amount: number
+  rate: string
   proof: string
   status: TransactionStatusType
   createdAt: Date

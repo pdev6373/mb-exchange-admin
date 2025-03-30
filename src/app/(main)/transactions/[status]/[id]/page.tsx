@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { useGlobalContext } from '@/context/GlobalContext'
-import { formatToUSD } from '@/helpers/common'
 import { useApiRequest } from '@/hooks/useApiRequest'
 import { ITransaction, TransactionStatusType } from '@/types/models/transaction'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
@@ -40,6 +39,7 @@ export default function Transaction({ params }: Transaction) {
   const { apiRequest: getTransaction, loading: gettingTransaction } = useApiRequest<ITransaction>()
   const { apiRequest: updateTransaction, loading: updatingTransaction } = useApiRequest<ITransaction>()
   const [status, setStatus] = useState<TransactionStatusType>('pending')
+  const [amountTransferred, setAmountTransferred] = useState<string>()
 
   const fetchTransaction = async () => {
     const response = await getTransaction({
@@ -50,12 +50,17 @@ export default function Transaction({ params }: Transaction) {
   }
 
   const updateTransactionStatus = async () => {
+    if (!amountTransferred && status == 'successful') return
+
     const response = await updateTransaction({
-      url: `/admin/transactions/${params.id}/${status}`,
+      url: `/admin/transactions/${params.id}/${status}/${Number(amountTransferred) || 0}`,
       method: 'PATCH',
       showToast: true,
     })
-    if (response.success) setTransaction(response.data)
+    if (response.success) {
+      setTransaction(response.data)
+      setAmountTransferred(undefined)
+    }
     setShowAlert(false)
   }
 
@@ -73,9 +78,28 @@ export default function Transaction({ params }: Transaction) {
             <AlertDialogDescription>
               {`This action will mark this transaction as ${status}, are you sure you want to continue?`}
             </AlertDialogDescription>
+            <AlertDialogContent>
+              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                {`Amount Transferred (${transaction?.rate?.startsWith('₦') ? 'In Naira' : transaction?.rate?.startsWith('₵') ? 'In Cedis' : 'In Dollars'})`}
+              </label>
+              <div className="mt-1.5">
+                <input
+                  value={amountTransferred}
+                  onChange={(e) => setAmountTransferred(e.target.value)}
+                  className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-[#ccc] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#333] sm:text-sm sm:leading-6"
+                />
+              </div>
+            </AlertDialogContent>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowAlert(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel
+              onClick={() => {
+                setShowAlert(false)
+                setAmountTransferred(undefined)
+              }}
+            >
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               className={
                 status == 'successful'
@@ -85,6 +109,7 @@ export default function Transaction({ params }: Transaction) {
                     : 'bg-destructive text-destructive-foreground hover:bg-destructive'
               }
               onClick={updateTransactionStatus}
+              disabled={Number(amountTransferred) <= 0}
             >
               {updatingTransaction ? (
                 <div className="py-1">
@@ -211,17 +236,20 @@ export default function Transaction({ params }: Transaction) {
               )}
             </DescriptionDetails>
             <DescriptionTerm>Asset:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.asset?.name || '-'}</DescriptionDetails>
+            <DescriptionDetails>
+              {transaction?.asset?.name
+                ? `${transaction?.asset?.name} (${transaction?.asset?.symbol?.toUpperCase()})`
+                : '-'}
+            </DescriptionDetails>
             <DescriptionTerm>Platform:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.platform?.platform || '-'}</DescriptionDetails>
+            <DescriptionDetails className="capitalize">{transaction?.platform?.platform || '-'}</DescriptionDetails>
             <DescriptionTerm>Address:</DescriptionTerm>
             <DescriptionDetails>{transaction?.address || '-'}</DescriptionDetails>
             <DescriptionTerm>Quantity:</DescriptionTerm>
             <DescriptionDetails>{transaction?.quantity || '-'}</DescriptionDetails>
             <DescriptionTerm>Rate:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.rate ? formatToUSD(transaction.rate) : '-'}</DescriptionDetails>
+            <DescriptionDetails>{transaction?.rate || '-'}</DescriptionDetails>
             <DescriptionTerm>Amount:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.amount ? formatToUSD(transaction.amount) : '-'}</DescriptionDetails>
             <DescriptionTerm>Transaction Initiation Date:</DescriptionTerm>
             <DescriptionDetails>{transaction ? format(transaction.createdAt, 'MMMM d, yyyy') : '-'}</DescriptionDetails>
             <DescriptionTerm>Transaction Approval Date:</DescriptionTerm>
