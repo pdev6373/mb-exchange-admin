@@ -17,15 +17,15 @@ import { useApiRequest } from '@/hooks/useApiRequest'
 import { jwtDecode } from 'jwt-decode'
 import { LoaderIcon } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 
 type Data = {
   email: string
   role: string
 }
 
-export default function Invite() {
-  const searchParams = useSearchParams() // Hook must be called unconditionally
+function InviteContent() {
+  const searchParams = useSearchParams()
   const router = useRouter()
 
   const [showAcceptAlert, setShowAcceptAlert] = useState<'pending' | 'yes' | 'no'>('pending')
@@ -40,13 +40,13 @@ export default function Invite() {
   const { apiRequest: confirmToken } = useApiRequest()
 
   useEffect(() => {
-    if (typeof window === 'undefined') return // Ensure execution only in the browser
+    if (typeof window === 'undefined') return
 
     const tokenParam = searchParams.get('token')
     if (!tokenParam) return router.replace('/auth/admin/invite/error')
     ;(async () => {
       try {
-        const decoded = jwtDecode<Data>(tokenParam) // Ensure correct decoding
+        const decoded = jwtDecode<Data>(tokenParam)
         setToken(tokenParam)
         setData(decoded)
 
@@ -56,7 +56,6 @@ export default function Invite() {
           data: { token: tokenParam },
         })
 
-        console.log('ss', response)
         if (response.success) {
           setShowAcceptAlert('yes')
         } else {
@@ -94,7 +93,6 @@ export default function Invite() {
     if (response.success) router.replace('/auth/admin/invite/rejected')
   }
 
-  // Show a loading spinner until confirmation is completed
   if (showAcceptAlert === 'pending' && !showCompleteSetup) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -189,5 +187,19 @@ export default function Invite() {
         </Card>
       ) : null}
     </div>
+  )
+}
+
+export default function Invite() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen w-full items-center justify-center">
+          <LoaderIcon className="h-4 w-4 animate-spin" />
+        </div>
+      }
+    >
+      <InviteContent />
+    </Suspense>
   )
 }
