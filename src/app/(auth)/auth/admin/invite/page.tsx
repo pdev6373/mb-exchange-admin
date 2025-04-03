@@ -111,9 +111,9 @@ function InviteContent() {
               {`You have been invited as an ${data?.role} on MB Exchange. Click accept or reject to proceed.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex flex-col gap-5">
             <AlertDialogAction
-              className="flex flex-col gap-5 bg-destructive text-destructive-foreground hover:bg-destructive"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive"
               onClick={rejectInviteHandler}
             >
               {rejectingInvite ? (
