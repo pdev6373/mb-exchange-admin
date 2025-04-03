@@ -113,7 +113,7 @@ function InviteContent() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive"
+              className="flex flex-col gap-5 bg-destructive text-destructive-foreground hover:bg-destructive"
               onClick={rejectInviteHandler}
             >
               {rejectingInvite ? (
