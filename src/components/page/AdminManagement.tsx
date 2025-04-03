@@ -171,15 +171,17 @@ export default function AdminManagement() {
                 <div className="grid w-full items-center gap-1">
                   <Label className="text-sm text-[#0E1728]">Role</Label>
                   <Select onValueChange={(val: RoleType) => setRole(val)} value={role} defaultValue={'admin'}>
-                    <SelectTrigger className="gap-2">
-                      <SelectValue defaultValue={'admin'} />
+                    <SelectTrigger className="gap-2 capitalize">
+                      <SelectValue defaultValue={'admin'} className="capitalize" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         {Object.values(Role)
                           .filter((role) => role !== 'superadmin')
                           .map((role) => (
-                            <SelectItem value={role}>{role}</SelectItem>
+                            <SelectItem value={role} className="capitalize">
+                              {role}
+                            </SelectItem>
                           ))}
                       </SelectGroup>
                     </SelectContent>
