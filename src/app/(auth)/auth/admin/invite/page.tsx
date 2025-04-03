@@ -1,4 +1,5 @@
 'use client'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,19 +25,12 @@ type Data = {
 }
 
 export default function Invite() {
-  // Use dynamic import for client-side only libraries
-  const [isClientSide, setIsClientSide] = useState(false)
-
-  useEffect(() => {
-    setIsClientSide(true)
-  }, [])
-
-  const searchParams = isClientSide ? useSearchParams() : null
-  const router = isClientSide ? useRouter() : null
+  const searchParams = useSearchParams() // Hook must be called unconditionally
+  const router = useRouter()
 
   const [showAcceptAlert, setShowAcceptAlert] = useState<'pending' | 'yes' | 'no'>('pending')
   const [showCompleteSetup, setShowCompleteSetup] = useState(false)
-  const [data, setData] = useState<Data>()
+  const [data, setData] = useState<Data | null>(null)
   const [token, setToken] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -46,33 +40,34 @@ export default function Invite() {
   const { apiRequest: confirmToken } = useApiRequest()
 
   useEffect(() => {
-    if (!isClientSide) return
+    if (typeof window === 'undefined') return // Ensure execution only in the browser
+
+    const tokenParam = searchParams.get('token')
+    if (!tokenParam) return router.replace('/auth/admin/invite/error')
     ;(async () => {
       try {
-        const tokenParam = searchParams?.get('token')
-        if (tokenParam) {
-          const decoded = (await jwtDecode(tokenParam)) as Data
-          setToken(tokenParam)
-          setData(decoded)
+        const decoded = jwtDecode<Data>(tokenParam) // Ensure correct decoding
+        setToken(tokenParam)
+        setData(decoded)
 
-          const response = await confirmToken({
-            url: `/admin-auth/accept-invite`,
-            method: 'POST',
-            data: {
-              token: tokenParam,
-            },
-          })
+        const response = await confirmToken({
+          url: `/admin-auth/accept-invite`,
+          method: 'POST',
+          data: { token: tokenParam },
+        })
 
-          console.log('ss', response)
-          if (response.success) setShowAcceptAlert('yes')
-          else router?.replace('/auth/admin/invite/error')
+        console.log('ss', response)
+        if (response.success) {
+          setShowAcceptAlert('yes')
+        } else {
+          router.replace('/auth/admin/invite/error')
         }
       } catch (e) {
         console.error('Error decoding token:', e)
-        router?.replace('/auth/admin/invite/error')
+        router.replace('/auth/admin/invite/error')
       }
     })()
-  }, [isClientSide, searchParams, router])
+  }, [searchParams, router])
 
   const acceptInviteHandler = async () => {
     const response = await acceptInvite({
@@ -84,7 +79,7 @@ export default function Invite() {
         password,
       },
     })
-    if (response.success) router?.replace('/auth/admin/invite/accepted')
+    if (response.success) router.replace('/auth/admin/invite/accepted')
   }
 
   const rejectInviteHandler = async () => {
@@ -96,29 +91,26 @@ export default function Invite() {
         action: 'reject',
       },
     })
-    if (response.success) router?.replace('/auth/admin/invite/rejected')
+    if (response.success) router.replace('/auth/admin/invite/rejected')
   }
 
-  // Render nothing during server-side rendering
-  if (!isClientSide) {
-    return null
-  }
-
-  if (showAcceptAlert !== 'yes' && !showCompleteSetup)
+  // Show a loading spinner until confirmation is completed
+  if (showAcceptAlert === 'pending' && !showCompleteSetup) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <LoaderIcon className="h-4 w-4 animate-spin" />
       </div>
     )
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <AlertDialog open={showAcceptAlert == 'yes'}>
+      <AlertDialog open={showAcceptAlert === 'yes'}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{'Admin invitation'}</AlertDialogTitle>
             <AlertDialogDescription>
-              {`You have been invited as an ${data?.role} on MB Exchange, click accept or reject to proceed with the request.`}
+              {`You have been invited as an ${data?.role} on MB Exchange. Click accept or reject to proceed.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -135,7 +127,7 @@ export default function Invite() {
               )}
             </AlertDialogAction>
             <AlertDialogAction
-              className={'bg-green-600 text-white hover:bg-green-600'}
+              className="bg-green-600 text-white hover:bg-green-600"
               onClick={() => {
                 setShowAcceptAlert('no')
                 setShowCompleteSetup(true)
@@ -150,8 +142,8 @@ export default function Invite() {
       {showCompleteSetup ? (
         <Card className="w-[450px]">
           <CardHeader>
-            <CardTitle>Setup password</CardTitle>
-            <CardDescription>Setup your password to access the admin portal</CardDescription>
+            <CardTitle>Setup Password</CardTitle>
+            <CardDescription>Setup your password to access the admin portal.</CardDescription>
           </CardHeader>
           <CardContent>
             <form>
@@ -195,9 +187,7 @@ export default function Invite() {
             </Button>
           </CardFooter>
         </Card>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   )
 }
