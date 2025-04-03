@@ -11,7 +11,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useGlobalContext } from '@/context/GlobalContext'
-import { exportToCSV, exportToExcel, formatToUSD } from '@/helpers/common'
+import { exportToCSV, exportToExcel } from '@/helpers/common'
 import { useApiRequest } from '@/hooks/useApiRequest'
 import { TransactionRoutes } from '@/types'
 import { Pagination as PaginationType } from '@/types/common'
@@ -137,14 +137,12 @@ export function Transactions({ status }: Transactions) {
                     transactions.map((transaction) => ({
                       'Transaction ID': transaction.key,
                       Asset: transaction.asset.name,
-                      Platform: transaction.platform.platform,
-                      'Platform Address': transaction.address,
+                      Network: `${transaction.platform.platform[0].toUpperCase()}${transaction.platform.platform?.slice(1).toLowerCase()}`,
+                      'Network Address': transaction.address,
                       Quantity: transaction.quantity,
-                      Rate: formatToUSD(transaction.rate),
-                      Amount: formatToUSD(transaction.amount),
+                      Rate: transaction.rate,
                       Status: transaction.status,
                       'Initiation Date': format(transaction.createdAt, 'MMM d, yyyy'),
-                      'Approval Date': transaction.dateApproved ? format(transaction.dateApproved, 'MMM d, yyyy') : '-',
                     })),
                     `${status} transactions`
                   )
@@ -161,14 +159,12 @@ export function Transactions({ status }: Transactions) {
                     transactions.map((transaction) => ({
                       'Transaction ID': transaction.key,
                       Asset: transaction.asset.name,
-                      Platform: transaction.platform.platform,
-                      'Platform Address': transaction.address,
+                      Network: `${transaction.platform.platform[0].toUpperCase()}${transaction.platform.platform?.slice(1).toLowerCase()}`,
+                      'Network Address': transaction.address,
                       Quantity: transaction.quantity,
-                      Rate: formatToUSD(transaction.rate),
-                      Amount: formatToUSD(transaction.amount),
+                      Rate: transaction.rate,
                       Status: transaction.status,
                       'Initiation Date': format(transaction.createdAt, 'MMM d, yyyy'),
-                      'Approval Date': transaction.dateApproved ? format(transaction.dateApproved, 'MMM d, yyyy') : '-',
                     })),
                     `${status} transactions`
                   )
@@ -186,30 +182,27 @@ export function Transactions({ status }: Transactions) {
           <TableRow>
             <TableHeader>Transaction ID</TableHeader>
             <TableHeader>Asset</TableHeader>
-            <TableHeader>Platform</TableHeader>
-            <TableHeader>Platform Address</TableHeader>
+            <TableHeader>Network</TableHeader>
+            <TableHeader>Network Address</TableHeader>
             <TableHeader>Quantity</TableHeader>
             <TableHeader>Rate</TableHeader>
-            <TableHeader>Amount</TableHeader>
             {status == 'all' ? <TableHeader>Status</TableHeader> : <></>}
             <TableHeader>Initiation Date</TableHeader>
-            <TableHeader>Approval Date</TableHeader>
           </TableRow>
         </TableHead>
 
         <TableBody>
           {loading ? (
-            Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={status == 'all' ? 10 : 9} />)
+            Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={status == 'all' ? 8 : 7} />)
           ) : transactions?.length ? (
             transactions?.map((transaction) => (
               <TableRow key={transaction._id} href={`/transactions/transaction/${transaction._id}`}>
                 <TableCell className="uppercase text-[#665FD5]">{transaction.key}</TableCell>
                 <TableCell>{transaction.asset.name}</TableCell>
-                <TableCell>{transaction.platform?.platform}</TableCell>
+                <TableCell className="capitalize">{transaction.platform?.platform}</TableCell>
                 <TableCell>{transaction.address}</TableCell>
                 <TableCell>{transaction.quantity}</TableCell>
-                <TableCell>{formatToUSD(transaction.rate)}</TableCell>
-                <TableCell>{formatToUSD(transaction.amount)}</TableCell>
+                <TableCell>{transaction.rate}</TableCell>
                 {status == 'all' ? (
                   <TableCell>
                     {
@@ -231,14 +224,11 @@ export function Transactions({ status }: Transactions) {
                   <></>
                 )}
                 <TableCell>{format(transaction.createdAt, 'MMM d, yyyy')}</TableCell>
-                <TableCell>
-                  {transaction.dateApproved ? format(transaction.dateApproved, 'MMM d, yyyy') : '-'}
-                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell rowSpan={1} colSpan={status == 'all' ? 10 : 9}>
+              <TableCell rowSpan={1} colSpan={status == 'all' ? 8 : 7}>
                 <div className="flex w-full grow flex-col items-center justify-center gap-4 pb-6 pt-14 text-center">
                   <Image src={'/svgs/no-data.svg'} alt="no data" width={150} height={150} />
                   <p className="text-lg font-semibold text-gray-700">No data</p>

@@ -113,59 +113,49 @@ export default function Home() {
             <TableRow>
               <TableHeader>Transaction ID</TableHeader>
               <TableHeader>Asset</TableHeader>
-              <TableHeader>Platform</TableHeader>
-              <TableHeader>Platform Address</TableHeader>
+              <TableHeader>Network</TableHeader>
+              <TableHeader>Network Address</TableHeader>
               <TableHeader>Quantity</TableHeader>
               <TableHeader>Rate</TableHeader>
-              <TableHeader>Amount</TableHeader>
-              {status == 'all' ? <TableHeader>Status</TableHeader> : <></>}
+              <TableHeader>Status</TableHeader>
               <TableHeader>Initiation Date</TableHeader>
-              <TableHeader>Approval Date</TableHeader>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {gettingRecentTransactions ? (
-              Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={11} />)
+              Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={8} />)
             ) : transactions?.length ? (
               transactions?.map((transaction) => (
                 <TableRow key={transaction._id} href={`/transactions/transaction/${transaction._id}`}>
                   <TableCell className="uppercase text-[#665FD5]">{transaction.key}</TableCell>
                   <TableCell>{transaction.asset.name}</TableCell>
-                  <TableCell>{transaction.platform?.platform}</TableCell>
+                  <TableCell className="capitalize">{transaction.platform?.platform}</TableCell>
                   <TableCell>{transaction.address}</TableCell>
                   <TableCell>{transaction.quantity}</TableCell>
-                  <TableCell>{formatToUSD(transaction.rate)}</TableCell>
-                  <TableCell>{formatToUSD(transaction.amount)}</TableCell>
-                  {status == 'all' ? (
-                    <TableCell>
-                      {
-                        <Badge
-                          color={
-                            transaction?.status == 'successful'
-                              ? 'green'
-                              : transaction?.status == 'failed'
-                                ? 'zinc'
-                                : 'yellow'
-                          }
-                          className="px-3.5 capitalize"
-                        >
-                          {transaction?.status}
-                        </Badge>
-                      }
-                    </TableCell>
-                  ) : (
-                    <></>
-                  )}
-                  <TableCell>{format(transaction.createdAt, 'MMM d, yyyy')}</TableCell>
+                  <TableCell>{transaction.rate}</TableCell>
                   <TableCell>
-                    {transaction.dateApproved ? format(transaction.dateApproved, 'MMM d, yyyy') : '-'}
+                    {
+                      <Badge
+                        color={
+                          transaction?.status == 'successful'
+                            ? 'green'
+                            : transaction?.status == 'failed'
+                              ? 'zinc'
+                              : 'yellow'
+                        }
+                        className="px-3.5 capitalize"
+                      >
+                        {transaction?.status}
+                      </Badge>
+                    }
                   </TableCell>
+                  <TableCell>{format(transaction.createdAt, 'MMM d, yyyy')}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell rowSpan={1} colSpan={11}>
+                <TableCell rowSpan={1} colSpan={8}>
                   <div className="flex w-full grow flex-col items-center justify-center gap-4 pb-6 pt-14 text-center">
                     <Image src={'/svgs/no-data.svg'} alt="no data" width={150} height={150} />
                     <p className="text-lg font-semibold text-gray-700">No data</p>
@@ -195,13 +185,12 @@ export default function Home() {
               <TableHeader>Last Name</TableHeader>
               <TableHeader>Status</TableHeader>
               <TableHeader>Initiation Date</TableHeader>
-              <TableHeader>Approval Date</TableHeader>
             </TableRow>
           </TableHead>
 
           <TableBody>
             {gettingRecentRewards ? (
-              Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={7} />)
+              Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={6} />)
             ) : rewards?.length ? (
               rewards?.map((reward) => (
                 <TableRow key={reward._id} href={`/rewards/reward/${reward._id}`}>
@@ -217,12 +206,11 @@ export default function Home() {
                     }
                   </TableCell>
                   <TableCell>{format(reward.createdAt, 'MMM d, yyyy')}</TableCell>
-                  <TableCell>{reward.dateApproved ? format(reward.dateApproved, 'MMM d, yyyy') : '-'}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell rowSpan={1} colSpan={7}>
+                <TableCell rowSpan={1} colSpan={6}>
                   <div className="flex w-full grow flex-col items-center justify-center gap-4 pb-6 pt-14 text-center">
                     <Image src={'/svgs/no-data.svg'} alt="no data" width={150} height={150} />
                     <p className="text-lg font-semibold text-gray-700">No data</p>

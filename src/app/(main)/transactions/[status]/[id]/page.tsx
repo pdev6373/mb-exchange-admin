@@ -80,9 +80,9 @@ export default function Transaction({ params }: Transaction) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           {status == 'successful' ? (
-            <AlertDialogContent>
+            <div>
               <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-                {`Amount Transferred (${transaction?.rate?.startsWith('₦') ? 'In Naira' : transaction?.rate?.startsWith('₵') ? 'In Cedis' : 'In Dollars'})`}
+                {`Amount Transferred (In Dollars)`}
               </label>
               <div className="mt-1.5">
                 <input
@@ -91,7 +91,7 @@ export default function Transaction({ params }: Transaction) {
                   className="block w-full rounded-md border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-[#ccc] placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#333] sm:text-sm sm:leading-6"
                 />
               </div>
-            </AlertDialogContent>
+            </div>
           ) : (
             <></>
           )}
@@ -113,7 +113,7 @@ export default function Transaction({ params }: Transaction) {
                     : 'bg-destructive text-destructive-foreground hover:bg-destructive'
               }
               onClick={updateTransactionStatus}
-              disabled={Number(amountTransferred) <= 0}
+              disabled={Number(amountTransferred) <= 0 && status == 'successful'}
             >
               {updatingTransaction ? (
                 <div className="py-1">
@@ -245,7 +245,7 @@ export default function Transaction({ params }: Transaction) {
                 ? `${transaction?.asset?.name} (${transaction?.asset?.symbol?.toUpperCase()})`
                 : '-'}
             </DescriptionDetails>
-            <DescriptionTerm>Platform:</DescriptionTerm>
+            <DescriptionTerm>Network:</DescriptionTerm>
             <DescriptionDetails className="capitalize">{transaction?.platform?.platform || '-'}</DescriptionDetails>
             <DescriptionTerm>Address:</DescriptionTerm>
             <DescriptionDetails>{transaction?.address || '-'}</DescriptionDetails>
@@ -253,7 +253,6 @@ export default function Transaction({ params }: Transaction) {
             <DescriptionDetails>{transaction?.quantity || '-'}</DescriptionDetails>
             <DescriptionTerm>Rate:</DescriptionTerm>
             <DescriptionDetails>{transaction?.rate || '-'}</DescriptionDetails>
-            <DescriptionTerm>Amount:</DescriptionTerm>
             <DescriptionTerm>Transaction Initiation Date:</DescriptionTerm>
             <DescriptionDetails>{transaction ? format(transaction.createdAt, 'MMMM d, yyyy') : '-'}</DescriptionDetails>
             <DescriptionTerm>Transaction Approval Date:</DescriptionTerm>
@@ -268,7 +267,7 @@ export default function Transaction({ params }: Transaction) {
                     src={transaction?.proof}
                     alt="Transaction proof"
                     fill
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'cover', borderRadius: 4 }}
                     priority
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />

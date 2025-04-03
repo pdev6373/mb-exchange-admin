@@ -17,7 +17,6 @@ import { useApiRequest } from '@/hooks/useApiRequest'
 import { Pagination as PaginationType } from '@/types/common'
 import { IUsers } from '@/types/models/counts'
 import { IUser } from '@/types/models/user'
-import { format } from 'date-fns'
 import { Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -144,9 +143,6 @@ export function Users({ type }: Users) {
                       'Pending Transactions': user?.pendingTransactions,
                       'Succesful Transactions': user?.successfulTransactions,
                       'Failed Transactions': user?.failedTransactions,
-                      Points: user?.points,
-                      Referred: user?.referred,
-                      'Date Joined': format(user.createdAt, 'MMM d, yyyy'),
                     })),
                     `${type} ${type === 'all' ? 'users' : ''}`
                   )
@@ -169,9 +165,6 @@ export function Users({ type }: Users) {
                       'Pending Transactions': user?.pendingTransactions,
                       'Succesful Transactions': user?.successfulTransactions,
                       'Failed Transactions': user?.failedTransactions,
-                      Points: user?.points,
-                      Referred: user?.referred,
-                      'Date Joined': format(user.createdAt, 'MMM d, yyyy'),
                     })),
                     `${type} ${type === 'all' ? 'users' : ''}`
                   )
@@ -193,15 +186,12 @@ export function Users({ type }: Users) {
             <TableHeader>Country</TableHeader>
             <TableHeader>Total Transactions</TableHeader>
             <TableHeader>Pending Transactions</TableHeader>
-            <TableHeader>Points</TableHeader>
-            <TableHeader>Referred</TableHeader>
-            <TableHeader>Date Joined</TableHeader>
           </TableRow>
         </TableHead>
 
         <TableBody>
           {loading ? (
-            Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={9} />)
+            Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={6} />)
           ) : users?.length ? (
             users?.map((user) => (
               <TableRow key={user._id} href={`/users/user/${user._id}`}>
@@ -211,15 +201,11 @@ export function Users({ type }: Users) {
                 <TableCell>{user?.country?.name || '-'}</TableCell>
                 <TableCell>{user?.totalTransactions || 0}</TableCell>
                 <TableCell>{user?.pendingTransactions || 0}</TableCell>
-                <TableCell>{user?.points || 0}</TableCell> <TableCell>{user?.referred || 0}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">{format(user.createdAt, 'MMM d, yyyy')}</div>
-                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell rowSpan={1} colSpan={9}>
+              <TableCell rowSpan={1} colSpan={6}>
                 <div className="flex w-full grow flex-col items-center justify-center gap-4 pb-6 pt-14 text-center">
                   <Image src={'/svgs/no-data.svg'} alt="no data" width={150} height={150} />
                   <p className="text-lg font-semibold text-gray-700">No data</p>
