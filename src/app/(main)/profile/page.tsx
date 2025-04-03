@@ -15,7 +15,6 @@ import { useEffect, useState } from 'react'
 export default function ProfilePage() {
   const [changePassword, setChangePassword] = useState(false)
   const [edit, setEdit] = useState(false)
-  const [name, setName] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -23,6 +22,12 @@ export default function ProfilePage() {
   const { apiRequest: getAdmin, loading: gettingAdmin } = useApiRequest()
   const { apiRequest: updateAdmin, loading: updatingAdmin } = useApiRequest<IAdmin>()
   const { apiRequest: updatePassword, loading: updatingPassword } = useApiRequest<IAdmin>()
+  const [name, setName] = useState(admin?.name || '')
+
+  useEffect(() => {
+    if (!admin) return
+    setName(admin?.name)
+  }, [admin])
 
   useEffect(() => {
     ;(async () => {
@@ -46,7 +51,6 @@ export default function ProfilePage() {
       setAdmin(response.data)
       setEdit(false)
     }
-    setName('')
   }
 
   const updateAdminPassword = async () => {
@@ -60,10 +64,12 @@ export default function ProfilePage() {
       },
     })
 
-    if (response.success) setChangePassword(false)
-    setCurrentPassword('')
-    setNewPassword('')
-    setConfirmPassword('')
+    if (response.success) {
+      setChangePassword(false)
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+    }
   }
 
   if (gettingAdmin)
@@ -94,7 +100,7 @@ export default function ProfilePage() {
                     <Button
                       onClick={() => {
                         setEdit(false)
-                        setName('')
+                        setName(admin?.name || '')
                       }}
                       variant={'ghost'}
                     >
