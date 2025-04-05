@@ -157,7 +157,7 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
       <SheetContent className="flex max-h-screen flex-col overflow-y-scroll">
         <SheetHeader>
           <SheetTitle>Add New Asset</SheetTitle>
-          <SheetDescription>Select a cryptocurrency, choose platforms, and add a rate.</SheetDescription>
+          <SheetDescription>Select a cryptocurrency, choose networks, and add a rate.</SheetDescription>
         </SheetHeader>
 
         <div className="mt-4">
@@ -179,7 +179,7 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
 
         {hasPlatforms ? (
           <div className="mt-4 space-y-3">
-            <h3 className="text-sm font-medium">Select Platforms:</h3>
+            <h3 className="text-sm font-medium">Select Networks:</h3>
             <div className="flex flex-col gap-3">
               {Object.keys(cryptoData.platforms ?? {})?.map(
                 (platform) =>

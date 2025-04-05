@@ -123,7 +123,7 @@ export default function Assets() {
               <TableHeader>Dollar Rate</TableHeader>
               <TableHeader>Naira Rate</TableHeader>
               <TableHeader>Cedis Rate</TableHeader>
-              <TableHeader>Total Platforms</TableHeader>
+              <TableHeader>Total Networks</TableHeader>
               <TableHeader>Status</TableHeader>
               <TableHeader>Actions</TableHeader>
             </TableRow>
