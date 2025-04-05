@@ -40,7 +40,7 @@ export default function Revenue({ params }: { params: { status: RevenueRoutes } 
         <Stat
           title="YTD Revenue"
           value={formatToUSD(counts?.revenue?.year?.revenue || 0)}
-          change={`+${pendingMonthlyRewards} pending ${pendingMonthlyRewards == 1 ? 'rewards' : 'rewardss'}`}
+          change={`+${pendingMonthlyRewards} pending ${pendingMonthlyRewards == 1 ? 'reward' : 'rewards'}`}
           description="this month"
           loading={gettingCounts}
         />

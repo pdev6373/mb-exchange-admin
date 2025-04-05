@@ -140,7 +140,6 @@ export function Rewards({ status }: Rewards) {
                       'Last Name': reward.user?.lastName,
                       Status: reward.status,
                       'Initiation Date': format(reward.createdAt, 'MMM d, yyyy'),
-                      'Approval Date': reward.dateApproved ? format(reward.dateApproved, 'MMM d, yyyy') : '-',
                     })),
                     `${status} rewards`
                   )
@@ -161,7 +160,6 @@ export function Rewards({ status }: Rewards) {
                       'Last Name': reward.user?.lastName,
                       Status: reward.status,
                       'Initiation Date': format(reward.createdAt, 'MMM d, yyyy'),
-                      'Approval Date': reward.dateApproved ? format(reward.dateApproved, 'MMM d, yyyy') : '-',
                     })),
                     `${status} rewards`
                   )
@@ -183,13 +181,12 @@ export function Rewards({ status }: Rewards) {
             <TableHeader>Last Name</TableHeader>
             {status == 'all' ? <TableHeader>Status</TableHeader> : <></>}
             <TableHeader>Initiation Date</TableHeader>
-            <TableHeader>Approval Date</TableHeader>
           </TableRow>
         </TableHead>
 
         <TableBody>
           {loading ? (
-            Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={7} />)
+            Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={status == 'all' ? 6 : 5} />)
           ) : rewards?.length ? (
             rewards?.map((reward) => (
               <TableRow key={reward._id} href={`/rewards/reward/${reward._id}`}>
@@ -209,12 +206,11 @@ export function Rewards({ status }: Rewards) {
                   <></>
                 )}
                 <TableCell>{format(reward.createdAt, 'MMM d, yyyy')}</TableCell>
-                <TableCell>{reward.dateApproved ? format(reward.dateApproved, 'MMM d, yyyy') : '-'}</TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell rowSpan={1} colSpan={7}>
+              <TableCell rowSpan={1} colSpan={status == 'all' ? 6 : 5}>
                 <div className="flex w-full grow flex-col items-center justify-center gap-4 pb-6 pt-14 text-center">
                   <Image src={'/svgs/no-data.svg'} alt="no data" width={150} height={150} />
                   <p className="text-lg font-semibold text-gray-700">No data</p>

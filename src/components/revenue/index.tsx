@@ -11,7 +11,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useGlobalContext } from '@/context/GlobalContext'
-import { exportToCSV, exportToExcel, formatToUSD } from '@/helpers/common'
+import { exportToCSV, exportToExcel } from '@/helpers/common'
 import { useApiRequest } from '@/hooks/useApiRequest'
 import { RevenueRoutes } from '@/types'
 import { Pagination as PaginationType } from '@/types/common'
@@ -134,11 +134,9 @@ export function Revenue({ status }: Revenue) {
                     transactions.map((transaction) => ({
                       'Transaction ID': transaction.key,
                       Quantity: transaction.quantity,
-                      Rate: formatToUSD(transaction.rate),
-                      Amount: formatToUSD(transaction.amount),
+                      Rate: transaction.rate,
                       Status: transaction.status,
                       'Initiation Date': format(transaction.createdAt, 'MMM d, yyyy'),
-                      'Approval Date': transaction.dateApproved ? format(transaction.dateApproved, 'MMM d, yyyy') : '-',
                     })),
                     `${status} revenue`
                   )
@@ -155,11 +153,9 @@ export function Revenue({ status }: Revenue) {
                     transactions.map((transaction) => ({
                       'Transaction ID': transaction.key,
                       Quantity: transaction.quantity,
-                      Rate: formatToUSD(transaction.rate),
-                      Amount: formatToUSD(transaction.amount),
+                      Rate: transaction.rate,
                       Status: transaction.status,
                       'Initiation Date': format(transaction.createdAt, 'MMM d, yyyy'),
-                      'Approval Date': transaction.dateApproved ? format(transaction.dateApproved, 'MMM d, yyyy') : '-',
                     })),
                     `${status} revenue`
                   )
@@ -178,31 +174,25 @@ export function Revenue({ status }: Revenue) {
             <TableHeader>Transaction ID</TableHeader>
             <TableHeader>Quantity</TableHeader>
             <TableHeader>Rate</TableHeader>
-            <TableHeader>Amount</TableHeader>
             <TableHeader>Initiation Date</TableHeader>
-            <TableHeader>Approval Date</TableHeader>
           </TableRow>
         </TableHead>
 
         <TableBody>
           {loading ? (
-            Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={6} />)
+            Array.from({ length: 5 }).map((_, index) => <LoadingTable key={index} colspan={4} />)
           ) : transactions?.length ? (
             transactions?.map((transaction) => (
               <TableRow key={transaction._id} href={`/revenue/revenue/${transaction._id}`}>
                 <TableCell className="uppercase text-[#665FD5]">{transaction.key}</TableCell>
                 <TableCell>{transaction.quantity}</TableCell>
-                <TableCell>{formatToUSD(transaction.rate)}</TableCell>
-                <TableCell>{formatToUSD(transaction.amount)}</TableCell>
+                <TableCell>{transaction.rate}</TableCell>
                 <TableCell>{format(transaction.createdAt, 'MMM d, yyyy')}</TableCell>
-                <TableCell>
-                  {transaction.dateApproved ? format(transaction.dateApproved, 'MMM d, yyyy') : '-'}
-                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell rowSpan={1} colSpan={6}>
+              <TableCell rowSpan={1} colSpan={4}>
                 <div className="flex w-full grow flex-col items-center justify-center gap-4 pb-6 pt-14 text-center">
                   <Image src={'/svgs/no-data.svg'} alt="no data" width={150} height={150} />
                   <p className="text-lg font-semibold text-gray-700">No data</p>

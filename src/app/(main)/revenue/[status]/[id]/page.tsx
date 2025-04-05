@@ -5,7 +5,6 @@ import { Divider } from '@/components/divider'
 import { Subheading } from '@/components/heading'
 import Line from '@/components/loader/line'
 import Profile from '@/components/profile'
-import { formatToUSD } from '@/helpers/common'
 import { useApiRequest } from '@/hooks/useApiRequest'
 import { ITransaction } from '@/types/models/transaction'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
@@ -100,9 +99,7 @@ export default function RevenueDetails({ params }: Revenue) {
             <DescriptionTerm>Quantity:</DescriptionTerm>
             <DescriptionDetails>{transaction?.quantity || '-'}</DescriptionDetails>
             <DescriptionTerm>Rate:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.rate ? formatToUSD(transaction.rate) : '-'}</DescriptionDetails>
-            <DescriptionTerm>Amount:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.amount ? formatToUSD(transaction.amount) : '-'}</DescriptionDetails>
+            <DescriptionDetails>{transaction?.rate ? transaction.rate : '-'}</DescriptionDetails>
             <DescriptionTerm>Transaction Initiation Date:</DescriptionTerm>
             <DescriptionDetails>{transaction ? format(transaction.createdAt, 'MMMM d, yyyy') : '-'}</DescriptionDetails>
             <DescriptionTerm>Transaction Approval Date:</DescriptionTerm>
