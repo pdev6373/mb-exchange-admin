@@ -1,13 +1,12 @@
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { useApiRequest } from '@/hooks/useApiRequest'
 import { cn } from '@/lib/utils'
-import { Check, ChevronsUpDown, LoaderIcon } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { Check, ChevronsUpDown, LoaderIcon, Plus, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 type Crypto = {
   id: string
@@ -16,25 +15,6 @@ type Crypto = {
   image: string
   current_price: number
   total_volume: number
-  platforms: object
-}
-
-type FetchedCryptoDetails = {
-  id: string
-  symbol: string
-  name: string
-  asset_platform_id: string | null
-  platforms: Record<string, string>
-  detail_platforms: Record<
-    string,
-    {
-      decimal_place: number | null
-      contract_address: string
-    }
-  >
-  description: {
-    en: string
-  }
 }
 
 type PlatformAddress = {
@@ -49,9 +29,9 @@ type CryptoSelector = {
 export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
   const [cryptos, setCryptos] = useState<Crypto[]>([])
   const [selectedCrypto, setSelectedCrypto] = useState<Crypto | null>(null)
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([])
   const [platformAddresses, setPlatformAddresses] = useState<PlatformAddress[]>([])
-  const [nativeAddress, setNativeAddress] = useState<string>('')
+  const [networkName, setNetworkName] = useState<string>('')
+  const [networkAddress, setNetworkAddress] = useState<string>('')
   const [rate, setRate] = useState('')
   const [ngnRate, setNgnRate] = useState('')
   const [ghcRate, setGhcRate] = useState('')
@@ -59,22 +39,22 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
   const [open, setOpen] = useState(false)
   const [page, setPage] = useState<number>(1)
   const [loading, setLoading] = useState(false)
-  const [cryptoData, setCryptoData] = useState<FetchedCryptoDetails>()
-  const [fetchingData, setFetchingData] = useState(false)
   const { apiRequest: addAsset, loading: addingAsset } = useApiRequest()
 
-  const hasPlatforms = cryptoData && Object.keys(cryptoData.platforms).some((key) => key !== '')
+  const hasPlatforms = platformAddresses.length > 0
 
   const isFormValid = () => {
     if (!selectedCrypto) return false
 
     if (hasPlatforms) {
-      if (selectedPlatforms.length === 0) return false
-      const allPlatformsHaveAddresses = selectedPlatforms.every((platform) =>
-        platformAddresses.some((pl) => pl.platform === platform && pl.address.trim() !== '')
+      const allPlatformsHaveAddresses = platformAddresses.every(
+        (pl) => pl.platform.trim() !== '' && pl.address.trim() !== ''
       )
       return allPlatformsHaveAddresses && rate !== '' && ghcRate !== '' && ngnRate !== ''
-    } else return nativeAddress.trim() !== '' && rate !== '' && ghcRate !== '' && ngnRate !== ''
+    } else {
+      // Require at least one network
+      return platformAddresses.length > 0 && rate !== '' && ghcRate !== '' && ngnRate !== ''
+    }
   }
 
   useEffect(() => {
@@ -93,51 +73,17 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
     fetchCryptos()
   }, [page])
 
-  const fetchCryptoData = async (id: string) => {
-    try {
-      setFetchingData(true)
-      const response = await fetch(`https://api.coingecko.com/api/v3/coins/${id}`)
-      const data = (await response.json()) as FetchedCryptoDetails
-      setCryptoData({
-        asset_platform_id: data.asset_platform_id,
-        description: {
-          en: data.description.en,
-        },
-        detail_platforms: data.detail_platforms,
-        id: data.id,
-        name: data.name,
-        platforms: data.platforms,
-        symbol: data.symbol,
-      })
-
-      setSelectedPlatforms([])
-      setPlatformAddresses([])
-      setNativeAddress('')
-      setRate('')
-    } finally {
-      setFetchingData(false)
+  const handleAddNetwork = () => {
+    if (networkName.trim() !== '' && networkAddress.trim() !== '') {
+      setPlatformAddresses((prev) => [...prev, { platform: networkName, address: networkAddress }])
+      setNetworkName('')
+      setNetworkAddress('')
     }
   }
 
-  const handlePlatformChange = (platform: string) => {
-    if (selectedPlatforms.includes(platform)) {
-      setSelectedPlatforms((prev) => prev.filter((p) => p !== platform))
-      setPlatformAddresses((prev) => prev.filter((pl) => pl.platform !== platform))
-    } else {
-      setSelectedPlatforms((prev) => [...prev, platform])
-      setPlatformAddresses((prev) => [...prev, { platform, address: '' }])
-    }
+  const handleRemoveNetwork = (index: number) => {
+    setPlatformAddresses((prev) => prev.filter((_, i) => i !== index))
   }
-
-  const handlePlatformAddressChange = (platform: string, address: string) => {
-    setPlatformAddresses((prev) => {
-      const existing = prev.find((pl) => pl.platform === platform)
-      if (existing) return prev.map((pl) => (pl.platform === platform ? { ...pl, address } : pl))
-      else return [...prev, { platform, address }]
-    })
-  }
-
-  const handleNativeAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => setNativeAddress(e.target.value)
 
   const handleSubmit = async () => {
     const response = await addAsset({
@@ -151,12 +97,10 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
         rate: Number(rate) || undefined,
         ngnRate: Number(ngnRate) || undefined,
         ghcRate: Number(ghcRate) || undefined,
-        description: cryptoData?.description?.en,
-        hasPlatforms,
+        description: '',
+        hasPlatforms: true,
         isActive: true,
-        platformAddresses: hasPlatforms
-          ? platformAddresses.filter((pl) => selectedPlatforms.includes(pl.platform))
-          : [{ platform: 'native', address: nativeAddress }],
+        platformAddresses: platformAddresses.length > 0 ? platformAddresses : [{ platform: 'native', address: '' }],
       },
       showToast: true,
     })
@@ -164,11 +108,10 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
     if (response.success) {
       onAddCrypto()
       setIsSheetOpen(false)
-      setCryptoData(undefined)
       setSelectedCrypto(null)
-      setSelectedPlatforms([])
       setPlatformAddresses([])
-      setNativeAddress('')
+      setNetworkName('')
+      setNetworkAddress('')
       setRate('')
       setNgnRate('')
       setGhcRate('')
@@ -177,8 +120,8 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
 
   const handleNextPage = () => setPage((prev) => prev + 1)
 
-  const showAddressSection = !fetchingData && selectedCrypto
-  const showRateSection = showAddressSection && ((hasPlatforms && selectedPlatforms.length > 0) || !hasPlatforms)
+  const showNetworkSection = selectedCrypto !== null
+  const showRateSection = showNetworkSection
 
   return (
     <div>
@@ -188,7 +131,7 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
         <SheetContent className="flex max-h-screen flex-col overflow-y-scroll">
           <SheetHeader>
             <SheetTitle>Add New Asset</SheetTitle>
-            <SheetDescription>Select a cryptocurrency, choose networks, and add a rate.</SheetDescription>
+            <SheetDescription>Select a cryptocurrency, add networks manually, and set rates.</SheetDescription>
           </SheetHeader>
 
           <div className="mt-4">
@@ -231,7 +174,6 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
                           onSelect={(currentValue) => {
                             const newValue = currentValue === selectedCrypto?.id ? selectedCrypto : crypto
                             setSelectedCrypto(newValue)
-                            fetchCryptoData(newValue.id)
                             setOpen(false)
                           }}
                         >
@@ -260,57 +202,50 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
             </Popover>
           </div>
 
-          {fetchingData && (
-            <div className="flex h-full items-center justify-center p-6">
-              <LoaderIcon className="h-5 w-5 animate-spin" />
-            </div>
-          )}
-
-          {showAddressSection && hasPlatforms && (
+          {showNetworkSection && (
             <div className="mt-4 space-y-3">
-              <h3 className="text-sm font-medium">Select Networks:</h3>
-              <div className="flex flex-col gap-3">
-                {Object.keys(cryptoData.platforms).map(
-                  (platform) =>
-                    platform !== '' && (
-                      <div key={platform}>
-                        <div className="flex cursor-pointer items-center space-x-2">
-                          <Checkbox
-                            id={platform}
-                            checked={selectedPlatforms.includes(platform)}
-                            onCheckedChange={() => handlePlatformChange(platform)}
-                          />
-                          <label htmlFor={platform} className="py-1 text-sm">
-                            {platform}
-                          </label>
-                        </div>
+              <h3 className="text-sm font-medium">Add Networks:</h3>
 
-                        {selectedPlatforms.includes(platform) && (
-                          <div className="mt-2 pl-6">
-                            <Input
-                              placeholder={`Enter ${platform} address`}
-                              value={platformAddresses.find((pl) => pl.platform === platform)?.address || ''}
-                              onChange={(e) => handlePlatformAddressChange(platform, e.target.value)}
-                              className="w-full"
-                            />
-                          </div>
-                        )}
+              {/* List of added networks */}
+              {platformAddresses.length > 0 && (
+                <div className="mb-3 space-y-2">
+                  {platformAddresses.map((platform, index) => (
+                    <div key={index} className="flex items-center justify-between rounded-md border p-2">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{platform.platform}</span>
+                        <span className="max-w-52 truncate text-xs text-gray-500">{platform.address}</span>
                       </div>
-                    )
-                )}
-              </div>
-            </div>
-          )}
+                      <Button variant="ghost" size="sm" onClick={() => handleRemoveNetwork(index)}>
+                        <X size={16} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-          {showAddressSection && !hasPlatforms && (
-            <div className="mt-4 space-y-1.5">
-              <h3 className="text-sm font-medium">Enter Address:</h3>
-              <Input
-                placeholder="Enter wallet address"
-                value={nativeAddress}
-                onChange={handleNativeAddressChange}
-                className="w-full"
-              />
+              {/* Add new network form */}
+              <div className="flex flex-col space-y-2">
+                <Input
+                  placeholder="Network name (e.g. Ethereum, BSC)"
+                  value={networkName}
+                  onChange={(e) => setNetworkName(e.target.value)}
+                  className="w-full"
+                />
+                <Input
+                  placeholder="Wallet address"
+                  value={networkAddress}
+                  onChange={(e) => setNetworkAddress(e.target.value)}
+                  className="w-full"
+                />
+                <Button
+                  variant="outline"
+                  onClick={handleAddNetwork}
+                  disabled={networkName.trim() === '' || networkAddress.trim() === ''}
+                  className="w-full"
+                >
+                  <Plus size={16} className="mr-2" /> Add Network
+                </Button>
+              </div>
             </div>
           )}
 
