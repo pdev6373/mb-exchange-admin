@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useGlobalContext } from '@/context/GlobalContext'
 import { useApiRequest } from '@/hooks/useApiRequest'
-import { ITransaction, TransactionStatusType } from '@/types/models/transaction'
+import { IUserTransaction, TransactionStatusType } from '@/types/models/transaction'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { format } from 'date-fns'
 import { LoaderIcon } from 'lucide-react'
@@ -35,9 +35,9 @@ export default function Transaction({ params }: Transaction) {
   const router = useRouter()
   const {} = useGlobalContext()
   const [showAlert, setShowAlert] = useState(false)
-  const [transaction, setTransaction] = useState<ITransaction>()
-  const { apiRequest: getTransaction, loading: gettingTransaction } = useApiRequest<ITransaction>()
-  const { apiRequest: updateTransaction, loading: updatingTransaction } = useApiRequest<ITransaction>()
+  const [transaction, setTransaction] = useState<IUserTransaction>()
+  const { apiRequest: getTransaction, loading: gettingTransaction } = useApiRequest<IUserTransaction>()
+  const { apiRequest: updateTransaction, loading: updatingTransaction } = useApiRequest<IUserTransaction>()
   const [status, setStatus] = useState<TransactionStatusType>('pending')
   const [amountTransferred, setAmountTransferred] = useState<string>()
 
@@ -154,7 +154,7 @@ export default function Transaction({ params }: Transaction) {
             <Subheading>Transactions Information</Subheading>
 
             <div className="flex flex-wrap items-center gap-2">
-              {transaction?.status !== 'successful' ? (
+              {transaction?.transaction?.status !== 'successful' ? (
                 <Button
                   variant={'success'}
                   className="shrink-0"
@@ -169,7 +169,7 @@ export default function Transaction({ params }: Transaction) {
                 <></>
               )}
 
-              {transaction?.status !== 'pending' ? (
+              {transaction?.transaction?.status !== 'pending' ? (
                 <Button
                   variant={'pending'}
                   className="shrink-0"
@@ -184,7 +184,7 @@ export default function Transaction({ params }: Transaction) {
                 <></>
               )}
 
-              {transaction?.status !== 'failed' ? (
+              {transaction?.transaction?.status !== 'failed' ? (
                 <Button
                   variant={'destructive'}
                   className="shrink-0"
@@ -212,26 +212,30 @@ export default function Transaction({ params }: Transaction) {
         ) : (
           <DescriptionList>
             <DescriptionTerm>Transaction ID:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.key || '-'}</DescriptionDetails>
+            <DescriptionDetails>{transaction?.transaction?.key || '-'}</DescriptionDetails>
             <DescriptionTerm>Transaction Status:</DescriptionTerm>
             <DescriptionDetails>
               <Badge
                 color={
-                  transaction?.status == 'successful' ? 'green' : transaction?.status == 'failed' ? 'zinc' : 'yellow'
+                  transaction?.transaction?.status == 'successful'
+                    ? 'green'
+                    : transaction?.transaction?.status == 'failed'
+                      ? 'zinc'
+                      : 'yellow'
                 }
                 className="px-3.5 capitalize"
               >
-                {transaction?.status}
+                {transaction?.transaction?.status}
               </Badge>
             </DescriptionDetails>
             <DescriptionTerm>User:</DescriptionTerm>
             <DescriptionDetails>
-              {transaction?.user ? (
+              {transaction?.transaction?.user ? (
                 <Link
-                  href={`/users/user/${transaction?.user?.id}`}
+                  href={`/users/user/${transaction?.transaction?.user?.id}`}
                   className="cursor-pointer text-[#665FD5] underline underline-offset-2"
                 >
-                  {transaction?.user?.firstName
+                  {transaction?.transaction?.user?.firstName
                     ? `${transaction.user.firstName} ${transaction.user.lastName}`
                     : 'View profile'}
                 </Link>
@@ -241,30 +245,64 @@ export default function Transaction({ params }: Transaction) {
             </DescriptionDetails>
             <DescriptionTerm>Asset:</DescriptionTerm>
             <DescriptionDetails>
-              {transaction?.asset?.name
-                ? `${transaction?.asset?.name} (${transaction?.asset?.symbol?.toUpperCase()})`
+              {transaction?.transaction?.asset?.name
+                ? `${transaction?.transaction?.asset?.name} (${transaction?.transaction?.asset?.symbol?.toUpperCase()})`
                 : '-'}
             </DescriptionDetails>
             <DescriptionTerm>Network:</DescriptionTerm>
-            <DescriptionDetails className="capitalize">{transaction?.platform?.platform || '-'}</DescriptionDetails>
+            <DescriptionDetails className="capitalize">
+              {transaction?.transaction?.platform?.platform || '-'}
+            </DescriptionDetails>
             <DescriptionTerm>Address:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.address || '-'}</DescriptionDetails>
+            <DescriptionDetails>{transaction?.transaction?.address || '-'}</DescriptionDetails>
             <DescriptionTerm>Quantity:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.quantity || '-'}</DescriptionDetails>
+            <DescriptionDetails>{transaction?.transaction?.quantity || '-'}</DescriptionDetails>
             <DescriptionTerm>Rate:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.rate || '-'}</DescriptionDetails>
+            <DescriptionDetails>{transaction?.transaction?.rate || '-'}</DescriptionDetails>
+            <DescriptionTerm>Bank Details:</DescriptionTerm>
+            <DescriptionDetails>
+              <div
+                className={`grid gap-3 sm:gap-3.5`}
+                style={{
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(19em, 100%), 1fr))',
+                }}
+              >
+                {transaction?.user?.banks
+                  ?.sort((a, b) => Number(b.default) - Number(a.default))
+                  ?.map((bank) => (
+                    <div
+                      key={bank.accountNumber}
+                      className={`flex flex-col gap-1 rounded ${bank?.default ? 'bg-green-500/15' : 'bg-zinc-600/10'} p-3`}
+                    >
+                      <p className="text-zinc-950">
+                        Account Name: <span className="font-medium text-zinc-600">{bank.accountName}</span>
+                      </p>
+                      <p className="text-zinc-950">
+                        Account Number: <span className="font-medium text-zinc-600">{bank?.accountNumber}</span>
+                      </p>
+                      <p className="text-zinc-950">
+                        Bank Name: <span className="font-medium text-zinc-600">{bank?.bankName}</span>
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            </DescriptionDetails>
             <DescriptionTerm>Transaction Initiation Date:</DescriptionTerm>
-            <DescriptionDetails>{transaction ? format(transaction.createdAt, 'MMMM d, yyyy') : '-'}</DescriptionDetails>
+            <DescriptionDetails>
+              {transaction ? format(transaction?.transaction?.createdAt, 'MMMM d, yyyy') : '-'}
+            </DescriptionDetails>
             <DescriptionTerm>Transaction Approval Date:</DescriptionTerm>
             <DescriptionDetails>
-              {transaction?.dateApproved ? format(transaction?.dateApproved, 'MMMM d, yyyy') : '-'}
+              {transaction?.transaction?.dateApproved
+                ? format(transaction?.transaction?.dateApproved, 'MMMM d, yyyy')
+                : '-'}
             </DescriptionDetails>
             <DescriptionTerm>Proof:</DescriptionTerm>
             <DescriptionDetails>
-              {transaction?.proof ? (
+              {transaction?.transaction?.proof ? (
                 <div className="relative h-64 w-full md:h-96">
                   <Image
-                    src={transaction?.proof}
+                    src={transaction?.transaction?.proof}
                     alt="Transaction proof"
                     fill
                     style={{ objectFit: 'cover', borderRadius: 4 }}

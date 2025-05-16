@@ -6,7 +6,7 @@ import { Subheading } from '@/components/heading'
 import Line from '@/components/loader/line'
 import Profile from '@/components/profile'
 import { useApiRequest } from '@/hooks/useApiRequest'
-import { ITransaction } from '@/types/models/transaction'
+import { IUserTransaction } from '@/types/models/transaction'
 import { ChevronLeftIcon } from '@heroicons/react/16/solid'
 import { format } from 'date-fns'
 import Link from 'next/link'
@@ -19,8 +19,8 @@ type Revenue = {
 
 export default function RevenueDetails({ params }: Revenue) {
   const router = useRouter()
-  const [transaction, setTransaction] = useState<ITransaction>()
-  const { apiRequest: getTransaction, loading: gettingTransaction } = useApiRequest<ITransaction>()
+  const [transaction, setTransaction] = useState<IUserTransaction>()
+  const { apiRequest: getTransaction, loading: gettingTransaction } = useApiRequest<IUserTransaction>()
 
   const fetchTransaction = async () => {
     const response = await getTransaction({
@@ -64,31 +64,35 @@ export default function RevenueDetails({ params }: Revenue) {
             <DescriptionTerm>Transaction ID:</DescriptionTerm>
             <DescriptionDetails>
               <Link
-                href={`/transactions/transaction/${transaction?._id}`}
+                href={`/transactions/transaction/${transaction?.transaction?._id}`}
                 className="cursor-pointer text-[#665FD5] underline underline-offset-2"
               >
-                {transaction?.key || 'View transaction'}
+                {transaction?.transaction?.key || 'View transaction'}
               </Link>
             </DescriptionDetails>
             <DescriptionTerm>Status:</DescriptionTerm>
             <DescriptionDetails>
               <Badge
                 color={
-                  transaction?.status == 'successful' ? 'green' : transaction?.status == 'failed' ? 'zinc' : 'yellow'
+                  transaction?.transaction?.status == 'successful'
+                    ? 'green'
+                    : transaction?.transaction?.status == 'failed'
+                      ? 'zinc'
+                      : 'yellow'
                 }
                 className="px-3.5 capitalize"
               >
-                {transaction?.status}
+                {transaction?.transaction?.status}
               </Badge>
             </DescriptionDetails>
             <DescriptionTerm>User:</DescriptionTerm>
             <DescriptionDetails>
-              {transaction?.user ? (
+              {transaction?.transaction?.user ? (
                 <Link
-                  href={`/users/user/${transaction?.user?.id}`}
+                  href={`/users/user/${transaction?.transaction?.user?.id}`}
                   className="cursor-pointer text-[#665FD5] underline underline-offset-2"
                 >
-                  {transaction?.user?.firstName
+                  {transaction?.transaction?.user?.firstName
                     ? `${transaction.user.firstName} ${transaction.user.lastName}`
                     : 'View profile'}
                 </Link>
@@ -97,14 +101,20 @@ export default function RevenueDetails({ params }: Revenue) {
               )}
             </DescriptionDetails>
             <DescriptionTerm>Quantity:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.quantity || '-'}</DescriptionDetails>
+            <DescriptionDetails>{transaction?.transaction?.quantity || '-'}</DescriptionDetails>
             <DescriptionTerm>Rate:</DescriptionTerm>
-            <DescriptionDetails>{transaction?.rate ? transaction.rate : '-'}</DescriptionDetails>
+            <DescriptionDetails>
+              {transaction?.transaction?.rate ? transaction?.transaction?.rate : '-'}
+            </DescriptionDetails>
             <DescriptionTerm>Transaction Initiation Date:</DescriptionTerm>
-            <DescriptionDetails>{transaction ? format(transaction.createdAt, 'MMMM d, yyyy') : '-'}</DescriptionDetails>
+            <DescriptionDetails>
+              {transaction ? format(transaction?.transaction?.createdAt, 'MMMM d, yyyy') : '-'}
+            </DescriptionDetails>
             <DescriptionTerm>Transaction Approval Date:</DescriptionTerm>
             <DescriptionDetails>
-              {transaction?.dateApproved ? format(transaction?.dateApproved, 'MMMM d, yyyy') : '-'}
+              {transaction?.transaction?.dateApproved
+                ? format(transaction?.transaction?.dateApproved, 'MMMM d, yyyy')
+                : '-'}
             </DescriptionDetails>
           </DescriptionList>
         )}

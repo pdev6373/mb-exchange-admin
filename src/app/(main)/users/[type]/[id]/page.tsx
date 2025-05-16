@@ -252,6 +252,34 @@ export default function User({ params }: { params: { id: string } }) {
               </DescriptionDetails>
               <DescriptionTerm>Registration Date:</DescriptionTerm>
               <DescriptionDetails>{user?.createdAt ? format(user.createdAt, 'MMM d, yyyy') : '-'}</DescriptionDetails>
+              <DescriptionTerm>Bank Details:</DescriptionTerm>
+              <DescriptionDetails>
+                <div
+                  className={`grid gap-3 sm:gap-3.5`}
+                  style={{
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(19em, 100%), 1fr))',
+                  }}
+                >
+                  {user?.banks
+                    ?.sort((a, b) => Number(b.default) - Number(a.default))
+                    ?.map((bank) => (
+                      <div
+                        key={bank.accountNumber}
+                        className={`flex flex-col gap-1 rounded ${bank?.default ? 'bg-green-500/15' : 'bg-zinc-600/10'} p-3`}
+                      >
+                        <p className="text-zinc-950">
+                          Account Name: <span className="font-medium text-zinc-600">{bank.accountName}</span>
+                        </p>
+                        <p className="text-zinc-950">
+                          Account Number: <span className="font-medium text-zinc-600">{bank?.accountNumber}</span>
+                        </p>
+                        <p className="text-zinc-950">
+                          Bank Name: <span className="font-medium text-zinc-600">{bank?.bankName}</span>
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </DescriptionDetails>
             </DescriptionList>
           </>
         )}
