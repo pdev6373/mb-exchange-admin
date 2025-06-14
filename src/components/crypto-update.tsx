@@ -85,7 +85,7 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
         detail_platforms: data.detail_platforms,
         id: data.id,
         name: data.name,
-        // platforms: data.platforms,
+        platforms: data.platforms,
         symbol: data.symbol,
       })
     } finally {
@@ -119,7 +119,7 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
       method: 'PATCH',
       data: {
         ngnRate: Number(ngnRate) || undefined,
-        platforms: hasPlatforms ? cryptoData?.platforms : undefined,
+        // platforms: hasPlatforms ? cryptoData?.platforms : undefined,
         isActive,
         platformAddresses: hasPlatforms
           ? platformAddresses.filter((pl) => selectedPlatforms?.includes(pl.platform))
