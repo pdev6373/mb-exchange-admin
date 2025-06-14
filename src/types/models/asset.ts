@@ -4,7 +4,6 @@ export interface IAsset {
   name: string
   symbol: string
   image?: string
-  rate: number
   ngnRate: number
   description?: string
   hasPlatforms?: boolean

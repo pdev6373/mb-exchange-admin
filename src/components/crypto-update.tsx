@@ -46,7 +46,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
     crypto?.platformAddresses.find((address) => address.platform == 'native')?.address || ('' as string)
   )
   console.log('sss', crypto)
-  const [rate, setRate] = useState(crypto.rate.toString())
   const [ngnRate, setNgnRate] = useState(crypto.ngnRate?.toString())
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(isOpen)
   const [cryptoData, setCryptoData] = useState<FetchedCryptoDetails | undefined>()
@@ -62,8 +61,8 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
       const allPlatformsHaveAddresses = selectedPlatforms?.every((platform) =>
         platformAddresses.some((pl) => pl.platform === platform && pl.address.trim() !== '')
       )
-      return allPlatformsHaveAddresses && rate !== ''
-    } else return nativeAddress.trim() !== '' && rate !== ''
+      return allPlatformsHaveAddresses && ngnRate !== ''
+    } else return nativeAddress.trim() !== '' && ngnRate !== ''
   }
 
   useEffect(() => {
@@ -120,7 +119,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
       url: `/assets/${crypto._id}`,
       method: 'PATCH',
       data: {
-        rate: Number(rate) || undefined,
         ngnRate: Number(ngnRate) || undefined,
         platforms: hasPlatforms ? cryptoData?.platforms : undefined,
         isActive,
@@ -138,7 +136,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
       setSelectedPlatforms([])
       setPlatformAddresses([])
       setNativeAddress('')
-      setRate('')
       setNgnRate('')
     }
   }

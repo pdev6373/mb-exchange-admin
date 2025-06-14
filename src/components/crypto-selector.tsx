@@ -32,7 +32,6 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
   const [platformAddresses, setPlatformAddresses] = useState<PlatformAddress[]>([])
   const [networkName, setNetworkName] = useState<string>('')
   const [networkAddress, setNetworkAddress] = useState<string>('')
-  const [rate, setRate] = useState('')
   const [ngnRate, setNgnRate] = useState('')
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(false)
   const [open, setOpen] = useState(false)
@@ -49,10 +48,10 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
       const allPlatformsHaveAddresses = platformAddresses.every(
         (pl) => pl.platform.trim() !== '' && pl.address.trim() !== ''
       )
-      return allPlatformsHaveAddresses && rate !== '' && ngnRate !== ''
+      return allPlatformsHaveAddresses && ngnRate !== ''
     } else {
       // Require at least one network
-      return platformAddresses.length > 0 && rate !== '' && ngnRate !== ''
+      return platformAddresses.length > 0 && ngnRate !== ''
     }
   }
 
@@ -93,7 +92,6 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
         name: selectedCrypto?.name,
         symbol: selectedCrypto?.symbol,
         image: selectedCrypto?.image,
-        rate: Number(rate) || undefined,
         ngnRate: Number(ngnRate) || undefined,
         description: '',
         hasPlatforms: true,
@@ -110,7 +108,6 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
       setPlatformAddresses([])
       setNetworkName('')
       setNetworkAddress('')
-      setRate('')
       setNgnRate('')
     }
   }
@@ -254,16 +251,6 @@ export default function CryptoSelector({ onAddCrypto }: CryptoSelector) {
                   placeholder="Enter naira rate"
                   value={ngnRate}
                   onChange={(e) => setNgnRate(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="mt-4 space-y-1.5">
-                <h3 className="text-sm font-medium">Add Rate (In Dollars):</h3>
-                <Input
-                  placeholder="Enter dollar rate"
-                  value={rate}
-                  onChange={(e) => setRate(e.target.value)}
                   className="w-full"
                 />
               </div>
