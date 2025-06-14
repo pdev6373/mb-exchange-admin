@@ -45,7 +45,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
   const [nativeAddress, setNativeAddress] = useState<string>(
     crypto?.platformAddresses.find((address) => address.platform == 'native')?.address || ('' as string)
   )
-  console.log('sss', crypto)
   const [ngnRate, setNgnRate] = useState(crypto.ngnRate?.toString())
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(isOpen)
   const [cryptoData, setCryptoData] = useState<FetchedCryptoDetails | undefined>()
@@ -86,7 +85,7 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
         detail_platforms: data.detail_platforms,
         id: data.id,
         name: data.name,
-        platforms: data.platforms,
+        // platforms: data.platforms,
         symbol: data.symbol,
       })
     } finally {
