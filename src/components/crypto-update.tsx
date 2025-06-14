@@ -48,7 +48,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
   console.log('sss', crypto)
   const [rate, setRate] = useState(crypto.rate.toString())
   const [ngnRate, setNgnRate] = useState(crypto.ngnRate?.toString())
-  const [ghcRate, setGhcRate] = useState(crypto.ghcRate?.toString())
   const [isSheetOpen, setIsSheetOpen] = useState<boolean>(isOpen)
   const [cryptoData, setCryptoData] = useState<FetchedCryptoDetails | undefined>()
   const [fetchingData, setFetchingData] = useState(false)
@@ -123,7 +122,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
       data: {
         rate: Number(rate) || undefined,
         ngnRate: Number(ngnRate) || undefined,
-        ghcRate: Number(ghcRate) || undefined,
         platforms: hasPlatforms ? cryptoData?.platforms : undefined,
         isActive,
         platformAddresses: hasPlatforms
@@ -142,7 +140,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
       setNativeAddress('')
       setRate('')
       setNgnRate('')
-      setGhcRate('')
     }
   }
 
@@ -235,16 +232,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
             placeholder="Enter rate"
             value={ngnRate}
             onChange={(e) => setNgnRate(e.target.value)}
-            className="w-full"
-          />
-        </div>
-
-        <div className="mt-4 space-y-1.5">
-          <h3 className="text-sm font-medium">Add Vip Rate (In Cedis):</h3>
-          <Input
-            placeholder="Enter vip rate"
-            value={ghcRate}
-            onChange={(e) => setGhcRate(e.target.value)}
             className="w-full"
           />
         </div>

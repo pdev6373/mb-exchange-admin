@@ -138,8 +138,7 @@ export default function Assets() {
                       asset?.name?.toLowerCase().trim().includes(search?.toLowerCase().trim()) ||
                       asset?.symbol?.toLowerCase().trim().includes(search?.toLowerCase().trim()) ||
                       asset?.rate?.toString()?.toLowerCase().trim().includes(search?.toLowerCase().trim()) ||
-                      asset?.ngnRate?.toString()?.toLowerCase().trim().includes(search?.toLowerCase().trim()) ||
-                      asset?.ghcRate?.toString()?.toLowerCase().trim().includes(search?.toLowerCase().trim())
+                      asset?.ngnRate?.toString()?.toLowerCase().trim().includes(search?.toLowerCase().trim())
                   )
                   ?.map((asset) => (
                     <TableRow key={asset._id} href={undefined}>
@@ -150,7 +149,6 @@ export default function Assets() {
                       </TableCell>
                       <TableCell>{`$${formatNumber(asset.rate)}`}</TableCell>
                       <TableCell>{`₦${formatNumber(asset.ngnRate)}`}</TableCell>
-                      <TableCell>{`GH₵${formatNumber(asset.ghcRate)}`}</TableCell>
                       <TableCell>{asset.platformAddresses?.length}</TableCell>
                       <TableCell>
                         {
