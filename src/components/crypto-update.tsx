@@ -236,16 +236,6 @@ export default function CryptoUpdate({ crypto, onEditCrypto, onClose, isOpen = f
           />
         </div>
 
-        <div className="mt-4 space-y-1.5">
-          <h3 className="text-sm font-medium">Add Vip Rate (In Dollars):</h3>
-          <Input
-            placeholder="Enter vip rate"
-            value={rate}
-            onChange={(e) => setRate(e.target.value)}
-            className="w-full"
-          />
-        </div>
-
         <div className="flex cursor-pointer items-center space-x-2">
           <Checkbox id="status" checked={isActive} onCheckedChange={() => setIsActive((prev) => !prev)} />
           <label htmlFor="status" className="py-1 text-sm">
